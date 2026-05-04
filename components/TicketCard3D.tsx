@@ -144,8 +144,8 @@ function ExpandedTicket({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-[60] overflow-y-auto"
-      style={{ background: 'rgba(3,3,5,0.88)', backdropFilter: 'blur(18px)' }}
+      className="fixed inset-0 overflow-y-auto"
+      style={{ zIndex: 100, background: 'rgba(3,3,5,0.88)', backdropFilter: 'blur(18px)' }}
       onClick={onClose}
     >
       <div className="min-h-full flex items-center justify-center p-4 sm:p-8">
