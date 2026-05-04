@@ -526,12 +526,12 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
         </motion.p>
       </section>
 
-      <AnimatePresence>
-        {expanded && createPortal(
-          <ExpandedTicket onClose={() => setExpanded(false)} />,
-          document.body
-        )}
-      </AnimatePresence>
+      {createPortal(
+        <AnimatePresence>
+          {expanded && <ExpandedTicket onClose={() => setExpanded(false)} />}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }
