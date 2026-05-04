@@ -353,6 +353,8 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
   const isInView = useInView(sectionRef, { once: true, margin: hero ? '0px' : '-100px' });
 
   const [expanded, setExpanded] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const angleRef = useRef(0);
   const lastTsRef = useRef(0);
@@ -526,7 +528,7 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
         </motion.p>
       </section>
 
-      {createPortal(
+      {mounted && createPortal(
         <AnimatePresence>
           {expanded && <ExpandedTicket onClose={() => setExpanded(false)} />}
         </AnimatePresence>,
