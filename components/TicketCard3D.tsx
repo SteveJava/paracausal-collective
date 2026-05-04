@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/CartContext';
@@ -526,7 +527,10 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
       </section>
 
       <AnimatePresence>
-        {expanded && <ExpandedTicket onClose={() => setExpanded(false)} />}
+        {expanded && createPortal(
+          <ExpandedTicket onClose={() => setExpanded(false)} />,
+          document.body
+        )}
       </AnimatePresence>
     </>
   );
