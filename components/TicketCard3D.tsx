@@ -144,7 +144,7 @@ function ExpandedTicket({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-0 z-50 overflow-y-auto"
+      className="fixed inset-0 z-[60] overflow-y-auto"
       style={{ background: 'rgba(3,3,5,0.88)', backdropFilter: 'blur(18px)' }}
       onClick={onClose}
     >
@@ -442,22 +442,22 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
           </p>
           <div className="relative select-none inline-block">
             <h1
-              className={`text-white leading-none ${hero ? 'text-6xl sm:text-8xl lg:text-[9rem]' : 'text-5xl sm:text-7xl'}`}
-              style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em' }}
+              className="text-white leading-none"
+              style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em', fontSize: hero ? 'clamp(2.4rem, 13vw, 9rem)' : 'clamp(2rem, 11vw, 5rem)' }}
             >
               AFTERLIGHT
             </h1>
             <h1
               aria-hidden
-              className={`absolute inset-0 leading-none ${hero ? 'text-6xl sm:text-8xl lg:text-[9rem]' : 'text-5xl sm:text-7xl'}`}
-              style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em', color: '#371F76', animation: 'glitch-1 4s infinite steps(1)', clipPath: 'inset(0 0 90% 0)', opacity: 0.8 }}
+              className="absolute inset-0 leading-none"
+              style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em', fontSize: hero ? 'clamp(2.4rem, 13vw, 9rem)' : 'clamp(2rem, 11vw, 5rem)', color: '#371F76', animation: 'glitch-1 4s infinite steps(1)', clipPath: 'inset(0 0 90% 0)', opacity: 0.8 }}
             >
               AFTERLIGHT
             </h1>
             <h1
               aria-hidden
-              className={`absolute inset-0 leading-none ${hero ? 'text-6xl sm:text-8xl lg:text-[9rem]' : 'text-5xl sm:text-7xl'}`}
-              style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em', color: '#020079', animation: 'glitch-2 5s infinite steps(1)', opacity: 0.6 }}
+              className="absolute inset-0 leading-none"
+              style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em', fontSize: hero ? 'clamp(2.4rem, 13vw, 9rem)' : 'clamp(2rem, 11vw, 5rem)', color: '#020079', animation: 'glitch-2 5s infinite steps(1)', opacity: 0.6 }}
             >
               AFTERLIGHT
             </h1>
