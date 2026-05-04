@@ -1,13 +1,15 @@
-import HeroSection from "@/components/HeroSection";
-import EventsSection from "@/components/EventsSection";
-import AboutSection from "@/components/AboutSection";
+import ParticleCanvas from '@/components/ParticleCanvas';
+import TicketCard3D from '@/components/TicketCard3D';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
-    <main className="pt-32">
-      <HeroSection />
-      <EventsSection />
-      <AboutSection />
-    </main>
+    <>
+      <ParticleCanvas />
+      <main className="relative z-10">
+        <TicketCard3D hero />
+        <Footer />
+      </main>
+    </>
   );
 }
