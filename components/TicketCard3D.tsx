@@ -250,7 +250,7 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
             willChange: 'transform',
             cursor: 'pointer',
           }}
-          onClick={() => router.push('/checkout')}
+          onClick={() => { window.location.href = '/checkout'; }}
         >
           <div
             className="absolute inset-0 rounded-2xl pointer-events-none"
