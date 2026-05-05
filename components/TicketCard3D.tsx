@@ -2,8 +2,7 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
-
-const XCEED_URL = 'https://xceed.me/en/cape-town/event/afterlight/229773/channel/paracausal';
+import { useRouter } from 'next/navigation';
 
 const CIRCUIT_PATHS = [
   'M 20 40 L 60 40 L 60 20 L 80 20',
@@ -126,6 +125,7 @@ function CardFace({ back = false }: { back?: boolean }) {
 }
 
 export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
+  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
@@ -250,7 +250,7 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
             willChange: 'transform',
             cursor: 'pointer',
           }}
-          onClick={() => window.open(XCEED_URL, '_blank', 'noopener,noreferrer')}
+          onClick={() => router.push('/checkout')}
         >
           <div
             className="absolute inset-0 rounded-2xl pointer-events-none"
