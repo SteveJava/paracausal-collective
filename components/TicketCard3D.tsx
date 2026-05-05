@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+
+const XCEED_URL = 'https://xceed.me/en/cape-town/event/afterlight/229773/channel/paracausal';
 
 const CIRCUIT_PATHS = [
   'M 20 40 L 60 40 L 60 20 L 80 20',
@@ -125,7 +126,6 @@ function CardFace({ back = false }: { back?: boolean }) {
 }
 
 export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
-  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
@@ -250,7 +250,7 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
             willChange: 'transform',
             cursor: 'pointer',
           }}
-          onClick={() => router.push('/checkout')}
+          onClick={() => window.open(XCEED_URL, '_blank', 'noopener,noreferrer')}
         >
           <div
             className="absolute inset-0 rounded-2xl pointer-events-none"
@@ -285,7 +285,7 @@ export default function TicketCard3D({ hero = false }: { hero?: boolean }) {
         transition={{ duration: 1, delay: hero ? 1.2 : 1 }}
         className={`text-[10px] tracking-[0.4em] text-white/20 uppercase relative z-10 ${hero ? 'mt-14' : 'mt-12'}`}
       >
-        Click to get tickets · Hover to control
+        Click to buy tickets · Hover to control
       </motion.p>
     </section>
   );
