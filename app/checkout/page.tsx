@@ -1,9 +1,39 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
 
 export default function CheckoutPage() {
+  useEffect(() => {
+    // Set brand colors before the widget reads them
+    (window as any).XCEED_WIDGET_CONFIG = {
+      backgroundColor: '#080808',
+      primaryTextColor: '#FFFDFA',
+      buttonColor: '#371F76',
+      buttonTextColor: '#FFFDFA',
+      accentColor: '#4a3896',
+      tagsColor: '#4a3896',
+    };
+
+    // Clear any leftover widget content from a previous mount
+    const widgetEl = document.getElementById('xceed-widget');
+    if (widgetEl) widgetEl.innerHTML = '';
+
+    // Dynamically inject the script so it re-runs on every page mount
+    const script = document.createElement('script');
+    script.src = 'https://widget.xceed.me/v2/loader.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      // Clean up on unmount so the next mount starts fresh
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+      if (widgetEl) widgetEl.innerHTML = '';
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#080808] text-[#FFFDFA]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       {/* Bg glow */}
@@ -39,29 +69,13 @@ export default function CheckoutPage() {
         {/* Divider */}
         <div className="mb-8 h-px" style={{ background: 'linear-gradient(to right, rgba(74,56,150,0.4), transparent)' }} />
 
-        {/* XCEED Widget */}
+        {/* XCEED Widget mounts here */}
         <div id="xceed-widget" />
 
         <p className="mt-10 text-center text-[9px] text-white/10 tracking-widest">
           Payments processed securely by XCEED · All sales final
         </p>
       </div>
-
-      {/* Brand colors injected before widget loads */}
-      <Script id="xceed-config" strategy="beforeInteractive">
-        {`
-          window.XCEED_WIDGET_CONFIG = {
-            backgroundColor: '#080808',
-            primaryTextColor: '#FFFDFA',
-            buttonColor: '#371F76',
-            buttonTextColor: '#FFFDFA',
-            accentColor: '#4a3896',
-            tagsColor: '#4a3896'
-          };
-        `}
-      </Script>
-
-      <Script src="https://widget.xceed.me/v2/loader.js" strategy="afterInteractive" />
     </div>
   );
 }
