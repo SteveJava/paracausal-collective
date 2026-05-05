@@ -39,12 +39,37 @@ export default function CheckoutPage() {
         {/* Divider */}
         <div className="mb-8 h-px" style={{ background: 'linear-gradient(to right, rgba(74,56,150,0.4), transparent)' }} />
 
-        {/* XCEED Widget */}
-        <div
-          className="relative overflow-hidden"
-          style={{ border: '1px solid rgba(74,56,150,0.2)', background: 'rgba(10,10,20,0.6)' }}
-        >
-          <div id="xceed-widget" />
+        {/* XCEED Widget — renders automatically when live on paracausal.world */}
+        <div id="xceed-widget" />
+
+        {/* Fallback CTA — shown while domain isn't yet paracausal.world */}
+        <noscript>
+          <a href="https://xceed.me/en/cape-town/event/afterlight/229773/channel/paracausal" target="_blank" rel="noopener noreferrer">
+            Buy Tickets on XCEED
+          </a>
+        </noscript>
+
+        {/* Direct link fallback shown until widget loads */}
+        <div id="xceed-fallback" className="py-16 flex flex-col items-center gap-6 text-center">
+          <p className="text-[10px] tracking-[0.4em] text-white/30 uppercase">Tickets available via</p>
+          <a
+            href="https://xceed.me/en/cape-town/event/afterlight/229773/channel/paracausal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-10 py-4 text-sm tracking-widest uppercase text-white transition-opacity hover:opacity-80 flex items-center gap-3"
+            style={{
+              background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(55,31,118,0.8))',
+              clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)',
+            }}
+          >
+            Buy on XCEED
+            <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M3 8h10M9 4l4 4-4 4" />
+            </svg>
+          </a>
+          <p className="text-[9px] text-white/20 tracking-widest">
+            Secure checkout · Payments handled by XCEED
+          </p>
         </div>
 
         {/* Footer note */}
@@ -67,10 +92,20 @@ export default function CheckoutPage() {
         `}
       </Script>
 
-      {/* XCEED widget loader */}
+      {/* XCEED widget loader — hides fallback when widget mounts successfully */}
       <Script
         src="https://widget.xceed.me/v2/loader.js"
         strategy="afterInteractive"
+        onLoad={() => {
+          // If XCEED widget actually populated the div, hide the fallback
+          setTimeout(() => {
+            const widget = document.getElementById('xceed-widget');
+            const fallback = document.getElementById('xceed-fallback');
+            if (widget && widget.children.length > 0 && fallback) {
+              fallback.style.display = 'none';
+            }
+          }, 2000);
+        }}
       />
     </div>
   );
