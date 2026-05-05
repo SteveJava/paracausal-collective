@@ -2,10 +2,38 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import Script from 'next/script';
 
 export default function CheckoutPage() {
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  useEffect(() => {
+    // Scroll to top immediately
+    window.scrollTo(0, 0);
+
+    const injectWidget = () => {
+      const script = document.createElement('script');
+      script.src = 'https://widget.xceed.me/v2/loader.js';
+      script.async = true;
+      // After widget initialises (and its forced reflow runs), snap back to top
+      script.onload = () => window.scrollTo(0, 0);
+      document.body.appendChild(script);
+    };
+
+    // Wait for full page load before injecting — prevents widget reflow
+    // from fighting the initial render and jumping the scroll position
+    if (document.readyState === 'complete') {
+      injectWidget();
+    } else {
+      window.addEventListener('load', injectWidget, { once: true });
+    }
+
+    return () => {
+      window.removeEventListener('load', injectWidget);
+      // Remove script so next visit starts fresh
+      const existing = document.querySelector('script[src*="xceed.me/v2/loader"]');
+      if (existing) existing.remove();
+      const widget = document.getElementById('xceed-widget');
+      if (widget) widget.innerHTML = '';
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#080808] text-[#FFFDFA]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -50,7 +78,6 @@ export default function CheckoutPage() {
         </p>
       </div>
 
-      <Script src="https://widget.xceed.me/v2/loader.js" strategy="afterInteractive" />
     </div>
   );
 }
