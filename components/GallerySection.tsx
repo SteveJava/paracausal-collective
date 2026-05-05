@@ -1,39 +1,34 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 
-const galleryItems = [
+type GalleryItem = {
+  id: number;
+  event: string;
+  date: string;
+  cols: 1 | 2;
+  rows: 1 | 2;
+  // Video item
+  thumb?: string;
+  loop?: string;
+  video?: string;
+  // Placeholder item
+  bg?: string;
+  accent?: string;
+  svg?: React.ReactNode;
+};
+
+const galleryItems: GalleryItem[] = [
   {
     id: 1,
-    event: 'AFTERLIGHT I',
-    date: 'Oct 2024',
+    event: 'SKORGEN',
+    date: 'Apr 2026',
     cols: 2,
     rows: 2,
-    bg: 'linear-gradient(135deg, #1a0030 0%, #0d001f 40%, #030010 100%)',
-    accent: '#371F76',
-    svg: (
-      <svg viewBox="0 0 200 200" className="absolute inset-0 w-full h-full opacity-40">
-        <defs>
-          <radialGradient id="g1" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#4a3896" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#7b2fbe" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="100" cy="100" r="80" fill="url(#g1)" />
-        {[...Array(8)].map((_, i) => (
-          <line
-            key={i}
-            x1="100" y1="100"
-            x2={100 + 90 * Math.cos((i * Math.PI) / 4)}
-            y2={100 + 90 * Math.sin((i * Math.PI) / 4)}
-            stroke="#4a3896" strokeWidth="0.5" strokeOpacity="0.4"
-          />
-        ))}
-        <circle cx="100" cy="100" r="30" fill="none" stroke="#4a3896" strokeWidth="0.5" strokeOpacity="0.5" />
-        <circle cx="100" cy="100" r="55" fill="none" stroke="#7b2fbe" strokeWidth="0.3" strokeOpacity="0.3" />
-      </svg>
-    ),
+    thumb: '/gallery/skorgen-thumb.jpg',
+    loop: '/gallery/skorgen-loop.mp4',
+    video: '/gallery/skorgen.mp4',
   },
   {
     id: 2,
@@ -131,7 +126,93 @@ const galleryItems = [
   },
 ];
 
-function GalleryItem({ item, onClick }: { item: typeof galleryItems[0]; onClick: () => void }) {
+function VideoTile({ item, onClick }: { item: GalleryItem; onClick: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-40px' });
+
+  useEffect(() => {
+    if (!videoRef.current) return;
+    if (hovered) {
+      videoRef.current.play().catch(() => {});
+    } else {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, [hovered]);
+
+  const colSpan = item.cols === 2 ? 'md:col-span-2' : 'md:col-span-1';
+  const rowSpan = item.rows === 2 ? 'md:row-span-2' : 'md:row-span-1';
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={isInView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className={`relative overflow-hidden cursor-pointer ${colSpan} ${rowSpan}`}
+      style={{ minHeight: item.rows === 2 ? 360 : 180 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+    >
+      {/* Thumbnail */}
+      {item.thumb && (
+        <img
+          src={item.thumb}
+          alt={item.event}
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+
+      {/* Hover loop video */}
+      {item.loop && (
+        <video
+          ref={videoRef}
+          src={item.loop}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+          style={{ opacity: hovered ? 1 : 0 }}
+          muted
+          loop
+          playsInline
+          preload="none"
+        />
+      )}
+
+      {/* Label overlay */}
+      <motion.div
+        animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 10 }}
+        transition={{ duration: 0.3 }}
+        className="absolute inset-0 flex flex-col justify-end p-6"
+        style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.9) 0%, transparent 60%)' }}
+      >
+        <p className="text-[9px] tracking-widest uppercase mb-1 text-white/50">{item.date}</p>
+        <p className="text-lg text-white tracking-widest" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+          {item.event}
+        </p>
+      </motion.div>
+
+      {/* Expand icon */}
+      <motion.div
+        animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.9 }}
+        transition={{ duration: 0.3 }}
+        className="absolute top-4 right-4"
+      >
+        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="white" strokeWidth="1.5">
+          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+        </svg>
+      </motion.div>
+
+      <div
+        className="absolute inset-0 border transition-all duration-300"
+        style={{ borderColor: hovered ? 'rgba(74,56,150,0.5)' : 'transparent' }}
+      />
+    </motion.div>
+  );
+}
+
+function PlaceholderTile({ item, onClick }: { item: GalleryItem; onClick: () => void }) {
   const [hovered, setHovered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
@@ -154,7 +235,6 @@ function GalleryItem({ item, onClick }: { item: typeof galleryItems[0]; onClick:
       <div className="absolute inset-0" style={{ background: item.bg }}>
         {item.svg}
       </div>
-
       <div
         className="absolute inset-0 transition-opacity duration-500"
         style={{
@@ -162,7 +242,6 @@ function GalleryItem({ item, onClick }: { item: typeof galleryItems[0]; onClick:
           opacity: hovered ? 1 : 0,
         }}
       />
-
       <motion.div
         animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 10 }}
         transition={{ duration: 0.3 }}
@@ -174,17 +253,14 @@ function GalleryItem({ item, onClick }: { item: typeof galleryItems[0]; onClick:
           {item.event}
         </p>
       </motion.div>
-
       <div
-        className="absolute inset-0 border transition-all duration-400"
+        className="absolute inset-0 border transition-all duration-300"
         style={{ borderColor: hovered ? `${item.accent}40` : 'transparent' }}
       />
-
       <motion.div
-        animate={{ scale: hovered ? 1.05 : 1 }}
-        transition={{ duration: 0.6 }}
+        animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.9 }}
+        transition={{ duration: 0.3 }}
         className="absolute top-4 right-4"
-        style={{ opacity: hovered ? 1 : 0 }}
       >
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="white" strokeWidth="1.5">
           <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
@@ -194,16 +270,72 @@ function GalleryItem({ item, onClick }: { item: typeof galleryItems[0]; onClick:
   );
 }
 
+function Lightbox({ item, onClose }: { item: GalleryItem; onClose: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 flex items-center justify-center p-4 sm:p-8"
+      style={{ zIndex: 100, background: 'rgba(3,3,5,0.97)', backdropFilter: 'blur(20px)' }}
+    >
+      <motion.div
+        initial={{ scale: 0.92, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.92, opacity: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-4xl overflow-hidden"
+        style={{ aspectRatio: '16/9' }}
+      >
+        {item.video ? (
+          <video
+            src={item.video}
+            className="w-full h-full object-cover"
+            autoPlay
+            controls
+            playsInline
+          />
+        ) : (
+          <div className="w-full h-full" style={{ background: item.bg }}>
+            {item.svg}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <p className="text-[10px] tracking-[0.5em] uppercase mb-2 text-white/40">{item.date}</p>
+              <p className="text-6xl text-white" style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.1em' }}>
+                {item.event}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-colors"
+          style={{ background: 'rgba(0,0,0,0.6)', clipPath: 'polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%)' }}
+        >
+          <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M4 4l8 8M12 4l-8 8" />
+          </svg>
+        </button>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function GallerySection() {
-  const [selected, setSelected] = useState<typeof galleryItems[0] | null>(null);
+  const [selected, setSelected] = useState<GalleryItem | null>(null);
+  const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+  useEffect(() => setMounted(true), []);
 
   return (
     <section id="gallery" ref={ref} className="relative py-24 sm:py-32 px-4 sm:px-6 overflow-hidden">
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 50% 50% at 20% 80%, rgba(57,255,20,0.04) 0%, transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse 50% 40% at 80% 20%, rgba(55,31,118,0.07) 0%, transparent 60%)' }}
       />
 
       <div className="max-w-6xl mx-auto">
@@ -211,12 +343,12 @@ export default function GallerySection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
-          className="mb-16"
+          className="mb-12 sm:mb-16"
         >
           <p className="text-[10px] tracking-[0.5em] uppercase mb-4" style={{ color: '#4a3896' }}>Archive</p>
           <h2
-            className="text-6xl md:text-8xl text-white leading-none"
-            style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em' }}
+            className="text-white leading-none"
+            style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em', fontSize: 'clamp(2.5rem, 8vw, 6rem)' }}
           >
             Past
             <br />
@@ -225,52 +357,21 @@ export default function GallerySection() {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 auto-rows-[180px]">
-          {galleryItems.map((item) => (
-            <GalleryItem key={item.id} item={item} onClick={() => setSelected(item)} />
-          ))}
+          {galleryItems.map((item) =>
+            item.thumb ? (
+              <VideoTile key={item.id} item={item} onClick={() => setSelected(item)} />
+            ) : (
+              <PlaceholderTile key={item.id} item={item} onClick={() => setSelected(item)} />
+            )
+          )}
         </div>
       </div>
 
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelected(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6"
-            style={{ background: 'rgba(3,3,5,0.95)', backdropFilter: 'blur(20px)' }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-2xl aspect-video overflow-hidden"
-              style={{ background: selected.bg }}
-            >
-              {selected.svg}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <p className="text-[10px] tracking-[0.5em] uppercase mb-2" style={{ color: selected.accent }}>
-                  {selected.date}
-                </p>
-                <p
-                  className="text-6xl text-white"
-                  style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.1em' }}
-                >
-                  {selected.event}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelected(null)}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-colors"
-              >
-                ✕
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {mounted && (
+        <AnimatePresence>
+          {selected && <Lightbox item={selected} onClose={() => setSelected(null)} />}
+        </AnimatePresence>
+      )}
     </section>
   );
 }
