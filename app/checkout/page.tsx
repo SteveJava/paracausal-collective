@@ -47,19 +47,6 @@ export default function CheckoutPage() {
         </p>
       </div>
 
-      <Script id="xceed-config" strategy="beforeInteractive">
-        {`
-          window.XCEED_WIDGET_CONFIG = {
-            backgroundColor: '#080808',
-            primaryTextColor: '#FFFDFA',
-            buttonColor: '#371F76',
-            buttonTextColor: '#FFFDFA',
-            accentColor: '#4a3896',
-            tagsColor: '#4a3896'
-          };
-        `}
-      </Script>
-
       <Script src="https://widget.xceed.me/v2/loader.js" strategy="afterInteractive" />
     </div>
   );
