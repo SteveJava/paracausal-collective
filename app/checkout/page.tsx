@@ -28,8 +28,8 @@ export default function CheckoutPage() {
             className="text-4xl sm:text-6xl text-white leading-none"
             style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em' }}
           >
-            GET YOUR<br />
-            <span className="text-white/20">TICKETS</span>
+            AFTERLIGHT V<br />
+            <span className="text-white/20">31 JULY 2026</span>
           </h1>
         </div>
 
