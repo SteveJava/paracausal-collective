@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/lib/CartContext';
 
 function CartIcon() {
@@ -98,14 +99,15 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-        <a href="#" className="relative group">
-          <span
-            className="font-display text-xl tracking-widest text-white"
-            style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.2em' }}
-          >
-            PARACAUSAL
-          </span>
-          <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-gradient-to-r from-[#020079] to-[#371F76] transition-all duration-300 group-hover:w-full" />
+        <a href="/" className="relative group flex items-center">
+          <Image
+            src="/logo.png"
+            alt="Paracausal"
+            width={160}
+            height={27}
+            className="object-contain transition-opacity duration-300 group-hover:opacity-80"
+            priority
+          />
         </a>
 
         <CartIcon />
