@@ -22,7 +22,7 @@ type GalleryItem = {
 const galleryItems: GalleryItem[] = [
   {
     id: 1,
-    event: 'SKORGEN',
+    event: 'ZDLCK B2B Skorgen',
     date: 'Apr 2026',
     cols: 2,
     rows: 2,
@@ -132,15 +132,12 @@ function VideoTile({ item, onClick }: { item: GalleryItem; onClick: () => void }
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
 
+  // Autoplay loop when tile enters view
   useEffect(() => {
-    if (!videoRef.current) return;
-    if (hovered) {
+    if (isInView && videoRef.current) {
       videoRef.current.play().catch(() => {});
-    } else {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
     }
-  }, [hovered]);
+  }, [isInView]);
 
   const colSpan = item.cols === 2 ? 'md:col-span-2' : 'md:col-span-1';
   const rowSpan = item.rows === 2 ? 'md:row-span-2' : 'md:row-span-1';
@@ -157,27 +154,25 @@ function VideoTile({ item, onClick }: { item: GalleryItem; onClick: () => void }
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
     >
+      {/* Thumbnail shown until video is ready */}
       {item.thumb && (
         <img src={item.thumb} alt={item.event} className="absolute inset-0 w-full h-full object-cover" />
       )}
+
+      {/* Loop video — autoplays muted when in view */}
       {item.loop && (
         <video
           ref={videoRef}
           src={item.loop}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-          style={{ opacity: hovered ? 1 : 0 }}
-          muted loop playsInline preload="none"
+          className="absolute inset-0 w-full h-full object-cover"
+          muted loop playsInline preload="auto"
         />
       )}
 
-      {/* Label — always visible on mobile, hover-reveal on desktop */}
+      {/* Gradient + label — always visible */}
       <div
-        className="absolute inset-0 flex flex-col justify-end p-4 md:p-6 md:opacity-0 md:translate-y-2 md:transition-all md:duration-300"
-        style={{
-          background: 'linear-gradient(to top, rgba(3,3,5,0.9) 0%, transparent 60%)',
-          opacity: hovered ? 1 : undefined,
-          transform: hovered ? 'translateY(0)' : undefined,
-        }}
+        className="absolute inset-0 flex flex-col justify-end p-4 md:p-6"
+        style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.92) 0%, rgba(3,3,5,0.2) 50%, transparent 100%)' }}
       >
         <p className="text-[9px] tracking-widest uppercase mb-1 text-white/50">{item.date}</p>
         <p className="text-base text-white tracking-widest" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
@@ -185,19 +180,24 @@ function VideoTile({ item, onClick }: { item: GalleryItem; onClick: () => void }
         </p>
       </div>
 
-      <motion.div
-        animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.9 }}
-        transition={{ duration: 0.3 }}
-        className="absolute top-3 right-3 hidden md:block"
-      >
-        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="white" strokeWidth="1.5">
-          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-        </svg>
-      </motion.div>
+      {/* Persistent expand cue — pulsing in top-right */}
+      <div className="absolute top-3 right-3 flex items-center gap-1.5">
+        <span className="text-[8px] tracking-widest uppercase text-white/50 hidden sm:block">Tap to watch</span>
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-7 h-7 flex items-center justify-center rounded-full border border-white/30"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+        >
+          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none" stroke="white" strokeWidth="1.5">
+            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+          </svg>
+        </motion.div>
+      </div>
 
       <div
         className="absolute inset-0 border transition-all duration-300"
-        style={{ borderColor: hovered ? 'rgba(74,56,150,0.5)' : 'transparent' }}
+        style={{ borderColor: hovered ? 'rgba(74,56,150,0.6)' : 'rgba(255,255,255,0.05)' }}
       />
     </motion.div>
   );
