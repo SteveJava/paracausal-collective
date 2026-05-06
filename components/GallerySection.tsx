@@ -144,6 +144,7 @@ function VideoTile({ item, onClick }: { item: GalleryItem; onClick: () => void }
 
   const colSpan = item.cols === 2 ? 'md:col-span-2' : 'md:col-span-1';
   const rowSpan = item.rows === 2 ? 'md:row-span-2' : 'md:row-span-1';
+  const mobileHeight = item.rows === 2 ? 'h-64' : 'h-48';
 
   return (
     <motion.div
@@ -151,53 +152,43 @@ function VideoTile({ item, onClick }: { item: GalleryItem; onClick: () => void }
       initial={{ opacity: 0, scale: 0.95 }}
       animate={isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative overflow-hidden cursor-pointer ${colSpan} ${rowSpan}`}
-      style={{ minHeight: item.rows === 2 ? 360 : 180 }}
+      className={`relative overflow-hidden cursor-pointer col-span-1 ${colSpan} ${rowSpan} ${mobileHeight} md:h-auto`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
     >
-      {/* Thumbnail */}
       {item.thumb && (
-        <img
-          src={item.thumb}
-          alt={item.event}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        <img src={item.thumb} alt={item.event} className="absolute inset-0 w-full h-full object-cover" />
       )}
-
-      {/* Hover loop video */}
       {item.loop && (
         <video
           ref={videoRef}
           src={item.loop}
           className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
           style={{ opacity: hovered ? 1 : 0 }}
-          muted
-          loop
-          playsInline
-          preload="none"
+          muted loop playsInline preload="none"
         />
       )}
 
-      {/* Label overlay */}
-      <motion.div
-        animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 10 }}
-        transition={{ duration: 0.3 }}
-        className="absolute inset-0 flex flex-col justify-end p-6"
-        style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.9) 0%, transparent 60%)' }}
+      {/* Label — always visible on mobile, hover-reveal on desktop */}
+      <div
+        className="absolute inset-0 flex flex-col justify-end p-4 md:p-6 md:opacity-0 md:translate-y-2 md:transition-all md:duration-300"
+        style={{
+          background: 'linear-gradient(to top, rgba(3,3,5,0.9) 0%, transparent 60%)',
+          opacity: hovered ? 1 : undefined,
+          transform: hovered ? 'translateY(0)' : undefined,
+        }}
       >
         <p className="text-[9px] tracking-widest uppercase mb-1 text-white/50">{item.date}</p>
-        <p className="text-lg text-white tracking-widest" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+        <p className="text-base text-white tracking-widest" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
           {item.event}
         </p>
-      </motion.div>
+      </div>
 
-      {/* Expand icon */}
       <motion.div
         animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.9 }}
         transition={{ duration: 0.3 }}
-        className="absolute top-4 right-4"
+        className="absolute top-3 right-3 hidden md:block"
       >
         <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="white" strokeWidth="1.5">
           <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
@@ -219,6 +210,7 @@ function PlaceholderTile({ item, onClick }: { item: GalleryItem; onClick: () => 
 
   const colSpan = item.cols === 2 ? 'md:col-span-2' : 'md:col-span-1';
   const rowSpan = item.rows === 2 ? 'md:row-span-2' : 'md:row-span-1';
+  const mobileHeight = item.rows === 2 ? 'h-64' : 'h-48';
 
   return (
     <motion.div
@@ -226,8 +218,7 @@ function PlaceholderTile({ item, onClick }: { item: GalleryItem; onClick: () => 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={isInView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative overflow-hidden cursor-pointer ${colSpan} ${rowSpan}`}
-      style={{ minHeight: item.rows === 2 ? 360 : 180 }}
+      className={`relative overflow-hidden cursor-pointer col-span-1 ${colSpan} ${rowSpan} ${mobileHeight} md:h-auto`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
@@ -242,30 +233,22 @@ function PlaceholderTile({ item, onClick }: { item: GalleryItem; onClick: () => 
           opacity: hovered ? 1 : 0,
         }}
       />
-      <motion.div
-        animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 10 }}
-        transition={{ duration: 0.3 }}
-        className="absolute inset-0 flex flex-col justify-end p-6"
+
+      {/* Label — always visible on mobile */}
+      <div
+        className="absolute inset-0 flex flex-col justify-end p-4 md:p-6"
         style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.9) 0%, transparent 60%)' }}
       >
         <p className="text-[9px] tracking-widest uppercase mb-1" style={{ color: item.accent }}>{item.date}</p>
-        <p className="text-lg text-white tracking-widest" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+        <p className="text-base text-white tracking-widest" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
           {item.event}
         </p>
-      </motion.div>
+      </div>
+
       <div
         className="absolute inset-0 border transition-all duration-300"
         style={{ borderColor: hovered ? `${item.accent}40` : 'transparent' }}
       />
-      <motion.div
-        animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.9 }}
-        transition={{ duration: 0.3 }}
-        className="absolute top-4 right-4"
-      >
-        <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="white" strokeWidth="1.5">
-          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-        </svg>
-      </motion.div>
     </motion.div>
   );
 }
@@ -356,7 +339,7 @@ export default function GallerySection() {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 auto-rows-[180px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3 md:auto-rows-[180px]">
           {galleryItems.map((item) =>
             item.thumb ? (
               <VideoTile key={item.id} item={item} onClick={() => setSelected(item)} />
