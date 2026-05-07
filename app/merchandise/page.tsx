@@ -42,7 +42,7 @@ function ProductCard({ product }: { product: ShopifyProduct }) {
         >
           {!sold && (
             <a
-              href={`https://paracausal-2.myshopify.com/products/${product.handle}`}
+              href={`https://${process.env.SHOPIFY_STORE_DOMAIN}/products/${product.handle}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full py-3 text-xs tracking-widest uppercase text-white text-center transition-opacity hover:opacity-80"
