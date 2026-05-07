@@ -1,26 +1,119 @@
-'use client';
-
-import { useState } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { getProducts, ShopifyProduct } from '@/lib/shopify';
 
-const placeholders = [
-  { label: 'Tee', hint: 'Crewneck' },
-  { label: 'Hoodie', hint: 'Pullover' },
-  { label: 'Cap', hint: 'Structured' },
-  { label: 'Tote', hint: 'Canvas' },
-  { label: 'Long Sleeve', hint: 'Oversize' },
-  { label: 'Vinyl', hint: 'Limited Run' },
-];
+// ── Product card (server-rendered) ─────────────────────────────────────────
 
-export default function MerchandisePage() {
-  const [email, setEmail] = useState('');
-  const [notified, setNotified] = useState(false);
+function ProductCard({ product }: { product: ShopifyProduct }) {
+  const image   = product.images.edges[0]?.node;
+  const variant = product.variants.edges[0]?.node;
+  const price   = variant?.price ?? product.priceRange.minVariantPrice;
+  const sold    = variant && !variant.availableForSale;
 
-  const handleNotify = (e: React.FormEvent) => {
-    e.preventDefault();
-    setNotified(true);
-  };
+  return (
+    <div
+      className="relative overflow-hidden group"
+      style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+    >
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden bg-[#0d0d0d]">
+        {image ? (
+          <img
+            src={image.url}
+            alt={image.altText ?? product.title}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, rgba(74,56,150,0.08) 0%, rgba(2,0,40,0.05) 100%)' }}
+          >
+            <svg viewBox="0 0 24 24" className="w-8 h-8 text-white/10" fill="none" stroke="currentColor" strokeWidth="1">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <polyline points="21 15 16 10 5 21" />
+            </svg>
+          </div>
+        )}
+
+        {/* Hover overlay with CTA */}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
+          style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.85) 0%, transparent 60%)' }}
+        >
+          {!sold && (
+            <a
+              href={`https://paracausal-2.myshopify.com/products/${product.handle}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 text-xs tracking-widest uppercase text-white text-center transition-opacity hover:opacity-80"
+              style={{
+                background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(74,56,150,0.85))',
+                clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
+              }}
+            >
+              Shop Now
+            </a>
+          )}
+        </div>
+
+        {/* Sold out badge */}
+        {sold && (
+          <div
+            className="absolute top-3 left-3 px-2.5 py-1 text-[8px] tracking-widest uppercase"
+            style={{ background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
+          >
+            Sold Out
+          </div>
+        )}
+
+        {/* Border glow */}
+        <div
+          className="absolute inset-0 border opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          style={{ borderColor: 'rgba(74,56,150,0.5)' }}
+        />
+      </div>
+
+      {/* Info */}
+      <div className="p-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <p
+          className="text-sm text-white tracking-wide mb-1 leading-snug"
+          style={{ fontFamily: "'Archivo Black', sans-serif" }}
+        >
+          {product.title}
+        </p>
+        <p className="text-xs text-white/40 tracking-wider">
+          {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Coming soon fallback ────────────────────────────────────────────────────
+
+function ComingSoon() {
+  return (
+    <div className="text-center py-24">
+      <div
+        className="inline-flex items-center gap-2 px-4 py-2 border text-[10px] tracking-widest uppercase mb-6"
+        style={{ borderColor: 'rgba(74,56,150,0.4)', color: '#9b7fd4', background: 'rgba(74,56,150,0.08)' }}
+      >
+        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#7b5fc0' }} />
+        Coming Soon
+      </div>
+      <p className="text-white/30 text-sm max-w-xs mx-auto">
+        No products listed yet — add items in your Shopify dashboard and they&apos;ll appear here automatically.
+      </p>
+    </div>
+  );
+}
+
+// ── Page ───────────────────────────────────────────────────────────────────
+
+export default async function MerchandisePage() {
+  const allProducts = await getProducts(12);
+  // Tickets live on the Events page — exclude them here
+  const products = allProducts.filter(p => p.handle !== 'afterlight-v');
 
   return (
     <div className="min-h-screen bg-[#080808] text-[#FFFDFA]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -31,129 +124,35 @@ export default function MerchandisePage() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-28 pb-24">
         {/* Back */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-12">
+        <div className="mb-12">
           <Link href="/" className="text-white/40 hover:text-white transition-colors text-xs tracking-widest uppercase">
             ← Home
           </Link>
-        </motion.div>
+        </div>
 
         {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-16 text-center"
-        >
+        <div className="mb-14">
           <p className="text-[10px] tracking-[0.5em] uppercase mb-4" style={{ color: '#4a3896' }}>Store</p>
           <h1
-            className="text-white leading-none mb-4"
+            className="text-white leading-none"
             style={{ fontFamily: "'Archivo Black', sans-serif", letterSpacing: '0.05em', fontSize: 'clamp(3rem, 10vw, 7rem)' }}
           >
             Merchandise
           </h1>
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 border text-[10px] tracking-widest uppercase"
-            style={{ borderColor: 'rgba(74,56,150,0.4)', color: '#9b7fd4', background: 'rgba(74,56,150,0.08)' }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#7b5fc0' }} />
-            Coming Soon
+        </div>
+
+        {/* Products or placeholder */}
+        {products.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {products.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
-        </motion.div>
+        ) : (
+          <ComingSoon />
+        )}
 
-        {/* Blurred placeholder grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-16"
-        >
-          {placeholders.map((item, i) => (
-            <motion.div
-              key={item.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 + i * 0.07 }}
-              className="relative overflow-hidden aspect-square"
-              style={{ border: '1px solid rgba(255,255,255,0.05)' }}
-            >
-              {/* Blurred placeholder */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: `linear-gradient(135deg, rgba(74,56,150,${0.06 + i * 0.02}) 0%, rgba(2,0,121,0.04) 100%)`,
-                }}
-              />
-
-              {/* Grid lines decoration */}
-              <svg className="absolute inset-0 w-full h-full opacity-10" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <line x1="50" y1="0" x2="50" y2="100" stroke="#4a3896" strokeWidth="0.5" />
-                <line x1="0" y1="50" x2="100" y2="50" stroke="#4a3896" strokeWidth="0.5" />
-              </svg>
-
-              {/* Lock icon */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <svg viewBox="0 0 24 24" className="w-6 h-6 text-white/15" fill="none" stroke="currentColor" strokeWidth="1">
-                  <rect x="3" y="11" width="18" height="11" rx="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <div className="text-center">
-                  <p className="text-[10px] tracking-widest uppercase text-white/30">{item.label}</p>
-                  <p className="text-[9px] text-white/15 tracking-wider mt-0.5">{item.hint}</p>
-                </div>
-              </div>
-
-              {/* Blur overlay */}
-              <div className="absolute inset-0" style={{ backdropFilter: 'blur(2px)' }} />
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Notify form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-          className="max-w-md mx-auto text-center"
-        >
-          <p className="text-white/40 text-sm mb-6 leading-relaxed">
-            Be the first to know when the Paracausal store drops. Limited runs, no restocks.
-          </p>
-
-          {notified ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center gap-3"
-            >
-              <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none" stroke="#9b7fd4" strokeWidth="1.5">
-                <polyline points="4 12 9 17 20 6" />
-              </svg>
-              <p className="text-[10px] tracking-[0.4em] text-[#4a3896] uppercase">You're on the list</p>
-            </motion.div>
-          ) : (
-            <form onSubmit={handleNotify} className="flex gap-2">
-              <input
-                type="email"
-                required
-                placeholder="your@email.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="flex-1 bg-transparent border border-white/10 text-white placeholder-white/25 px-4 py-3 text-xs tracking-wider focus:outline-none focus:border-[rgba(74,56,150,0.7)] transition-colors"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 text-xs tracking-widest uppercase text-white transition-opacity hover:opacity-80 shrink-0"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(55,31,118,0.8))',
-                  clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
-                }}
-              >
-                Notify Me
-              </button>
-            </form>
-          )}
-        </motion.div>
+        <p className="text-center text-[9px] tracking-[0.4em] text-white/15 uppercase mt-16">
+          Paracausal Collective · Cape Town, South Africa
+        </p>
       </div>
     </div>
   );
