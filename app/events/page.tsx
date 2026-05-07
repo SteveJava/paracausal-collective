@@ -10,7 +10,7 @@ const upcomingEvent = {
   venue: 'Cape Town, South Africa',
   status: 'Tickets Available',
   banner: '/events/afterlight-v-banner.jpg',
-  href: '/checkout',
+  href: 'https://paracausal-2.myshopify.com/products/afterlight-v',
 };
 
 const pastEvents = [
@@ -148,7 +148,9 @@ function UpcomingBanner() {
         {/* CTA */}
         <div>
           <a
-            href="/checkout"
+            href={upcomingEvent.href}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 text-xs tracking-widest uppercase text-white transition-opacity hover:opacity-80"
             style={{
               background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(74,56,150,0.85))',
