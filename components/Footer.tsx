@@ -26,11 +26,11 @@ const socials = [
 ];
 
 const navLinks = [
-  { label: 'Home',    href: '/' },
-  { label: 'Store',   href: '/merchandise' },
-  { label: 'Gallery', href: '/gallery' },
-  { label: 'About',   href: '/about' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Home',        href: '/' },
+  { label: 'Tickets',     href: '/checkout' },
+  { label: 'Merchandise', href: '/merchandise' },
+  { label: 'Gallery',     href: '/gallery' },
+  { label: 'Contact',     href: '/contact' },
 ];
 
 export default function Footer() {
