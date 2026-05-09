@@ -15,7 +15,11 @@ interface ProductData {
   variants: Variant[];
 }
 
-export default function MerchProduct() {
+interface Props {
+  productId: string;
+}
+
+export default function MerchProduct({ productId }: Props) {
   const [product,         setProduct]         = useState<ProductData | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [quantity,        setQuantity]        = useState(1);
@@ -24,7 +28,7 @@ export default function MerchProduct() {
   const [error,           setError]           = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/checkout?productId=15105738408304')
+    fetch(`/api/checkout?productId=${productId}`)
       .then(r => r.json())
       .then((data: ProductData) => {
         setProduct(data);

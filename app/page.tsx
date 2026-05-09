@@ -73,7 +73,8 @@ export default async function Home() {
     <main>
       <HeroCarousel merchProduct={merchProduct} />
       <About />
-      <MerchProduct />
+      <MerchProduct productId="15105243349360" />
+      <MerchProduct productId="15105738408304" />
       <Footer />
     </main>
   );
