@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 const navLinks = [
   { label: 'Home',        href: '/' },
-  { label: 'Tickets',     href: '/checkout' },
+  { label: 'Tickets',     href: '/events' },
   { label: 'Merchandise', href: '/merchandise' },
   { label: 'Gallery',     href: '/gallery' },
   { label: 'Contact',     href: '/contact' },

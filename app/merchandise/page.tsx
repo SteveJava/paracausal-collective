@@ -1,116 +1,160 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { getProducts, ShopifyProduct } from '@/lib/shopify';
 
-// ── Product card (server-rendered) ─────────────────────────────────────────
-
-function ProductCard({ product }: { product: ShopifyProduct }) {
-  const image   = product.images.edges[0]?.node;
-  const variant = product.variants.edges[0]?.node;
-  const price   = variant?.price ?? product.priceRange.minVariantPrice;
-  const sold    = variant && !variant.availableForSale;
-
-  return (
-    <div
-      className="relative overflow-hidden group"
-      style={{ border: '1px solid rgba(255,255,255,0.07)' }}
-    >
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-[#0d0d0d]">
-        {image ? (
-          <img
-            src={image.url}
-            alt={image.altText ?? product.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-        ) : (
-          <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, rgba(74,56,150,0.08) 0%, rgba(2,0,40,0.05) 100%)' }}
-          >
-            <svg viewBox="0 0 24 24" className="w-8 h-8 text-white/10" fill="none" stroke="currentColor" strokeWidth="1">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
-          </div>
-        )}
-
-        {/* Hover overlay with CTA */}
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4"
-          style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.85) 0%, transparent 60%)' }}
-        >
-          {!sold && (
-            <div
-              className="w-full py-3 text-xs tracking-widest uppercase text-white text-center"
-              style={{
-                background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(74,56,150,0.85))',
-                clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
-              }}
-            >
-              View Item
-            </div>
-          )}
-        </div>
-
-        {/* Sold out badge */}
-        {sold && (
-          <div
-            className="absolute top-3 left-3 px-2.5 py-1 text-[8px] tracking-widest uppercase"
-            style={{ background: 'rgba(0,0,0,0.7)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)' }}
-          >
-            Sold Out
-          </div>
-        )}
-
-        {/* Border glow */}
-        <div
-          className="absolute inset-0 border opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-          style={{ borderColor: 'rgba(74,56,150,0.5)' }}
-        />
-      </div>
-
-      {/* Info */}
-      <div className="p-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <p
-          className="text-sm text-white tracking-wide mb-1 leading-snug"
-          style={{ fontFamily: "'Archivo Black', sans-serif" }}
-        >
-          {product.title}
-        </p>
-        <p className="text-xs text-white/40 tracking-wider">
-          {price.currencyCode} {parseFloat(price.amount).toFixed(2)}
-        </p>
-      </div>
-    </div>
-  );
+declare global {
+  interface Window {
+    ShopifyBuy?: {
+      UI?: {
+        onReady: (client: unknown) => Promise<{
+          createComponent: (type: string, opts: unknown) => void;
+        }>;
+      };
+      buildClient?: (config: {
+        domain: string;
+        storefrontAccessToken: string;
+      }) => unknown;
+    };
+  }
 }
 
-// ── Coming soon fallback ────────────────────────────────────────────────────
+const BTN = {
+  'font-family':    "'Archivo Black', sans-serif",
+  'font-size':      '11px',
+  'letter-spacing': '0.12em',
+  'text-transform': 'uppercase',
+  'padding-top':    '14px',
+  'padding-bottom': '14px',
+  'padding-left':   '28px',
+  'padding-right':  '28px',
+  'background-color': '#020079',
+  ':hover': { 'background-color': '#0300ce' },
+  ':focus': { 'background-color': '#0300ce' },
+  'border-radius': '0',
+};
 
-function ComingSoon() {
-  return (
-    <div className="text-center py-24">
-      <div
-        className="inline-flex items-center gap-2 px-4 py-2 border text-[10px] tracking-widest uppercase mb-6"
-        style={{ borderColor: 'rgba(74,56,150,0.4)', color: '#9b7fd4', background: 'rgba(74,56,150,0.08)' }}
-      >
-        <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#7b5fc0' }} />
-        Coming Soon
-      </div>
-      <p className="text-white/30 text-sm max-w-xs mx-auto">
-        No products listed yet — add items in your Shopify dashboard and they&apos;ll appear here automatically.
-      </p>
-    </div>
-  );
+function initShopify() {
+  const client = window.ShopifyBuy!.buildClient!({
+    domain: 'rf9fpy-48.myshopify.com',
+    storefrontAccessToken: 'af7f813a822316f04d7b068940181abc',
+  });
+
+  window.ShopifyBuy!.UI!.onReady(client).then((ui) => {
+    const node = document.getElementById('merch-product');
+    if (!node) return;
+
+    ui.createComponent('product', {
+      id: '15105738408304',
+      node,
+      moneyFormat: 'R%20%7B%7Bamount%7D%7D',
+      options: {
+        product: {
+          styles: {
+            product: {
+              'background-color': 'transparent',
+              'max-width': '100%',
+              'text-align': 'left',
+            },
+            title: {
+              'font-family': "'Archivo Black', sans-serif",
+              color: '#ffffff',
+              'font-size': '1.4rem',
+              'font-weight': 'normal',
+              'letter-spacing': '0.03em',
+            },
+            price: {
+              color: 'rgba(255,255,255,0.4)',
+              'font-size': '0.85rem',
+              'letter-spacing': '0.1em',
+            },
+            compareAt: { color: 'rgba(255,255,255,0.2)' },
+            button: BTN,
+          },
+          contents: {
+            img:                true,
+            imgWithCarousel:    false,
+            title:              true,
+            variantTitle:       false,
+            price:              true,
+            options:            true,
+            quantity:           false,
+            quantityIncrement:  false,
+            quantityDecrement:  false,
+            quantityInput:      false,
+            button:             false,
+            buttonWithQuantity: true,
+            description:        false,
+          },
+          text: { button: 'Add to cart' },
+        },
+        modalProduct: {
+          contents: {
+            img:                false,
+            imgWithCarousel:    true,
+            button:             false,
+            buttonWithQuantity: true,
+          },
+          styles: {
+            product: {
+              '@media (min-width: 601px)': {
+                'max-width':     '100%',
+                'margin-left':   '0px',
+                'margin-bottom': '0px',
+              },
+            },
+            button: BTN,
+          },
+          text: { button: 'Add to cart' },
+        },
+        option: {},
+        cart: {
+          styles: {
+            button: BTN,
+            footer: { 'background-color': '#f9f9f9' },
+          },
+          text: { total: 'Subtotal', button: 'Checkout' },
+          popup: false,
+        },
+        toggle: {
+          styles: {
+            toggle: {
+              'background-color': '#020079',
+              ':hover': { 'background-color': '#0300ce' },
+              ':focus': { 'background-color': '#0300ce' },
+            },
+            count:    { color: '#ffffff' },
+            iconPath: { fill: '#ffffff' },
+          },
+        },
+      },
+    });
+  });
 }
 
-// ── Page ───────────────────────────────────────────────────────────────────
+export default function MerchandisePage() {
+  useEffect(() => {
+    const scriptURL =
+      'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
 
-export default async function MerchandisePage() {
-  const allProducts = await getProducts(12);
-  // Tickets live on the Events page — exclude them here
-  const products = allProducts.filter(p => p.handle !== 'afterlight-v');
+    // Reload on back-from-checkout so the SDK reinitialises cleanly
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) window.location.reload();
+    };
+    window.addEventListener('pageshow', handlePageShow);
+
+    if (window.ShopifyBuy?.UI) {
+      initShopify();
+    } else {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = scriptURL;
+      document.head.appendChild(script);
+      script.onload = initShopify;
+    }
+
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#080808] text-[#FFFDFA]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -138,14 +182,8 @@ export default async function MerchandisePage() {
           </h1>
         </div>
 
-        {/* Products or placeholder */}
-        {products.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-            {products.map(p => <ProductCard key={p.id} product={p} />)}
-          </div>
-        ) : (
-          <ComingSoon />
-        )}
+        {/* Shopify product with cart */}
+        <div id="merch-product" />
 
         <p className="text-center text-[9px] tracking-[0.4em] text-white/15 uppercase mt-16">
           Paracausal Collective · Cape Town, South Africa
