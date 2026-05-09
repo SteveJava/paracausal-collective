@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Footer from '@/components/Footer';
 import HeroCarousel from '@/components/HeroCarousel';
-import ShopifyBuyButton from '@/components/ShopifyBuyButton';
+import MerchProduct from '@/components/MerchProduct';
 import { getProducts } from '@/lib/shopify';
 
 // ── About ──────────────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ export default async function Home() {
     <main>
       <HeroCarousel merchProduct={merchProduct} />
       <About />
-      <ShopifyBuyButton />
+      <MerchProduct />
       <Footer />
     </main>
   );
