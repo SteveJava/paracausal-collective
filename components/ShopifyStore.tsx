@@ -157,14 +157,16 @@ export default function ShopifyStore() {
     const scriptURL =
       'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
 
+    // When the user navigates back from Shopify checkout the browser restores
+    // the page from the bfcache — the SDK is frozen and the cart stops working.
+    // Reloading on pageshow (persisted) gives them a fresh SDK every time.
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) window.location.reload();
+    };
+    window.addEventListener('pageshow', handlePageShow);
+
     if (window.ShopifyBuy?.UI) {
       ShopifyBuyInit();
-    } else if (window.ShopifyBuy) {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = scriptURL;
-      document.head.appendChild(script);
-      script.onload = ShopifyBuyInit;
     } else {
       const script = document.createElement('script');
       script.async = true;
@@ -172,6 +174,8 @@ export default function ShopifyStore() {
       document.head.appendChild(script);
       script.onload = ShopifyBuyInit;
     }
+
+    return () => window.removeEventListener('pageshow', handlePageShow);
   }, []);
 
   return (
