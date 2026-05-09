@@ -10,7 +10,7 @@ const upcomingEvent = {
   venue: 'Cape Town, South Africa',
   status: 'Tickets Available',
   banner: '/events/afterlight-v-banner.jpg',
-  href: 'https://paracausal-2.myshopify.com/products/afterlight-v',
+  href: '/checkout',
 };
 
 const pastEvents = [

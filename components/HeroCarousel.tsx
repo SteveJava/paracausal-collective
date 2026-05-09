@@ -155,10 +155,8 @@ function EventSlide() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <a
-            href="https://paracausal-2.myshopify.com/products/afterlight-v"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/checkout"
             className="inline-flex items-center gap-3 px-8 py-4 text-xs tracking-widest uppercase text-white transition-opacity hover:opacity-80"
             style={{
               background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(74,56,150,0.85))',
@@ -170,7 +168,7 @@ function EventSlide() {
             <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M3 8h10M9 4l4 4-4 4" />
             </svg>
-          </a>
+          </Link>
           <Link
             href="/events"
             className="inline-flex items-center gap-3 px-8 py-4 text-xs tracking-widest uppercase text-white/50 hover:text-white transition-colors"
@@ -260,10 +258,8 @@ function MerchSlide({ product }: { product: ShopifyProduct | null }) {
         </h2>
 
         <div className="flex flex-wrap gap-3 mt-10">
-          <a
-            href={product ? `https://paracausal-2.myshopify.com/products/${product.handle}` : '/merchandise'}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/merchandise"
             className="inline-flex items-center gap-3 px-8 py-4 text-xs tracking-widest uppercase text-white transition-opacity hover:opacity-80"
             style={{
               background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(74,56,150,0.85))',
@@ -275,7 +271,7 @@ function MerchSlide({ product }: { product: ShopifyProduct | null }) {
             <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M3 8h10M9 4l4 4-4 4" />
             </svg>
-          </a>
+          </Link>
           <Link
             href="/merchandise"
             className="inline-flex items-center gap-3 px-8 py-4 text-xs tracking-widest uppercase text-white/50 hover:text-white transition-colors"

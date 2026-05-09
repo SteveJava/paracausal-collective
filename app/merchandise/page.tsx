@@ -41,18 +41,15 @@ function ProductCard({ product }: { product: ShopifyProduct }) {
           style={{ background: 'linear-gradient(to top, rgba(3,3,5,0.85) 0%, transparent 60%)' }}
         >
           {!sold && (
-            <a
-              href={`https://${process.env.SHOPIFY_STORE_DOMAIN}/products/${product.handle}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3 text-xs tracking-widest uppercase text-white text-center transition-opacity hover:opacity-80"
+            <div
+              className="w-full py-3 text-xs tracking-widest uppercase text-white text-center"
               style={{
                 background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(74,56,150,0.85))',
                 clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
               }}
             >
-              Shop Now
-            </a>
+              View Item
+            </div>
           )}
         </div>
 

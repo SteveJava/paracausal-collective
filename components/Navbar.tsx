@@ -73,23 +73,8 @@ export default function Navbar() {
             ))}
           </ul>
 
-          {/* Right side: cart (always) + hamburger (mobile only) */}
+          {/* Right side: hamburger (mobile only) */}
           <div className="ml-auto flex items-center gap-4">
-
-            {/* Cart icon */}
-            <a
-              href="https://paracausal-2.myshopify.com/cart"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Cart"
-              className="text-white/50 hover:text-white transition-colors duration-200"
-            >
-              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 01-8 0" />
-              </svg>
-            </a>
 
             {/* Hamburger — mobile only */}
             <button
