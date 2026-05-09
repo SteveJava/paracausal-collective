@@ -147,10 +147,8 @@ function UpcomingBanner() {
 
         {/* CTA */}
         <div>
-          <a
+          <Link
             href={upcomingEvent.href}
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 text-xs tracking-widest uppercase text-white transition-opacity hover:opacity-80"
             style={{
               background: 'linear-gradient(135deg, rgba(2,0,121,0.95), rgba(74,56,150,0.85))',
@@ -162,7 +160,7 @@ function UpcomingBanner() {
             <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M3 8h10M9 4l4 4-4 4" />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
 
